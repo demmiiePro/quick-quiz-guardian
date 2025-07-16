@@ -7,8 +7,10 @@ import {
   CheckCircle, 
   Clock, 
   FileText, 
-  Award,
-  Home
+  Home,
+  User,
+  Calendar,
+  BookOpen
 } from 'lucide-react';
 
 const Submit = () => {
@@ -36,19 +38,7 @@ const Submit = () => {
     return `${mins} minutes ${secs} seconds`;
   };
 
-  const getGrade = (score: number, total: number) => {
-    const percentage = (score / total) * 100;
-    if (percentage >= 90) return { grade: 'A', color: 'text-green-600' };
-    if (percentage >= 80) return { grade: 'B', color: 'text-blue-600' };
-    if (percentage >= 70) return { grade: 'C', color: 'text-yellow-600' };
-    if (percentage >= 60) return { grade: 'D', color: 'text-orange-600' };
-    return { grade: 'F', color: 'text-red-600' };
-  };
-
   if (!result) return null;
-
-  const { grade, color } = getGrade(result.score, result.totalQuestions);
-  const percentage = ((result.score / result.totalQuestions) * 100).toFixed(1);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
@@ -62,43 +52,55 @@ const Submit = () => {
             Exam Submitted Successfully!
           </h1>
           <p className="text-lg text-gray-600">
-            Your answers have been recorded and submitted.
+            Your answers have been recorded and submitted for review.
           </p>
         </div>
 
-        {/* Result Card */}
+        {/* Submission Details */}
         <Card className="max-w-2xl mx-auto mb-8 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
-            <CardTitle className="text-center text-xl">Exam Summary</CardTitle>
+            <CardTitle className="text-center text-xl">Submission Details</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             {/* Student Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div>
-                <p className="text-sm text-gray-600">Student Name</p>
-                <p className="font-semibold text-lg">{result.student.name}</p>
+              <div className="flex items-center gap-3">
+                <User className="h-5 w-5 text-blue-600" />
+                <div>
+                  <p className="text-sm text-gray-600">Student Name</p>
+                  <p className="font-semibold text-lg">{result.student.name}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Class</p>
-                <p className="font-semibold text-lg">{result.student.class}</p>
+              <div className="flex items-center gap-3">
+                <BookOpen className="h-5 w-5 text-purple-600" />
+                <div>
+                  <p className="text-sm text-gray-600">Class</p>
+                  <p className="font-semibold text-lg">{result.student.class}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Subject</p>
-                <p className="font-semibold text-lg">{result.student.subject}</p>
+              <div className="flex items-center gap-3">
+                <FileText className="h-5 w-5 text-indigo-600" />
+                <div>
+                  <p className="text-sm text-gray-600">Subject</p>
+                  <p className="font-semibold text-lg">{result.student.subject}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Submission Date</p>
-                <p className="font-semibold text-lg">
-                  {new Date(result.submittedAt).toLocaleDateString()}
-                </p>
+              <div className="flex items-center gap-3">
+                <Calendar className="h-5 w-5 text-green-600" />
+                <div>
+                  <p className="text-sm text-gray-600">Submission Date</p>
+                  <p className="font-semibold text-lg">
+                    {new Date(result.submittedAt).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            {/* Exam Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <FileText className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">Questions</p>
+                <p className="text-sm text-gray-600">Total Questions</p>
                 <p className="text-xl font-bold text-blue-600">
                   {result.totalQuestions}
                 </p>
@@ -106,17 +108,9 @@ const Submit = () => {
               
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">Correct</p>
+                <p className="text-sm text-gray-600">Questions Answered</p>
                 <p className="text-xl font-bold text-green-600">
-                  {result.score}
-                </p>
-              </div>
-
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <Award className={`h-8 w-8 mx-auto mb-2 ${color}`} />
-                <p className="text-sm text-gray-600">Grade</p>
-                <p className={`text-xl font-bold ${color}`}>
-                  {grade}
+                  {Object.keys(result.answers).length}
                 </p>
               </div>
 
@@ -129,36 +123,33 @@ const Submit = () => {
               </div>
             </div>
 
-            {/* Score Display */}
-            <div className="text-center p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Final Score</h3>
-              <div className="flex items-center justify-center gap-4">
-                <span className="text-4xl font-bold text-blue-600">
-                  {result.score}/{result.totalQuestions}
-                </span>
-                <span className="text-3xl font-bold text-gray-400">|</span>
-                <span className="text-4xl font-bold text-green-600">
-                  {percentage}%
-                </span>
-              </div>
+            {/* Submission Confirmation */}
+            <div className="text-center p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Submission Reference
+              </h3>
+              <p className="text-sm text-gray-600 mb-2">
+                Submission ID: <span className="font-mono font-medium">#{result.submittedAt.slice(-8).toUpperCase()}</span>
+              </p>
+              <p className="text-sm text-gray-600">
+                Time: {new Date(result.submittedAt).toLocaleString()}
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Performance Message */}
+        {/* Next Steps */}
         <Card className="max-w-2xl mx-auto mb-8 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <CardContent className="p-6 text-center">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {percentage >= '80' ? 'Excellent Work!' : 
-               percentage >= '70' ? 'Good Job!' : 
-               percentage >= '60' ? 'Well Done!' : 'Keep Practicing!'}
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+              What Happens Next?
             </h3>
-            <p className="text-gray-600">
-              {percentage >= '80' ? 'You have demonstrated excellent understanding of the subject matter.' :
-               percentage >= '70' ? 'You have shown good grasp of the concepts covered.' :
-               percentage >= '60' ? 'You have a fair understanding. Review areas where you had difficulty.' :
-               'Consider reviewing the material and practicing more. You can do better!'}
-            </p>
+            <div className="space-y-2 text-gray-600 text-sm">
+              <p>✓ Your exam has been securely submitted to your teacher</p>
+              <p>✓ Your answers will be reviewed and graded</p>
+              <p>✓ Results will be announced according to your school's schedule</p>
+              <p>✓ Contact your teacher if you have any questions about the exam</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -176,7 +167,7 @@ const Submit = () => {
         {/* Footer */}
         <div className="text-center mt-8 text-gray-600">
           <p className="text-sm">
-            Your results have been recorded. Contact your teacher if you have any questions.
+            Your submission has been recorded. Please wait for your teacher to announce results.
           </p>
         </div>
       </div>
