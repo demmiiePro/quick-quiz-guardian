@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -331,11 +330,17 @@ const Exam = () => {
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
-    // Disable text selection
-    document.body.style.userSelect = 'none';
-    document.body.style.webkitUserSelect = 'none';
-    document.body.style.msUserSelect = 'none';
-    document.body.style.mozUserSelect = 'none';
+    // Disable text selection using proper TypeScript approach
+    const bodyStyle = document.body.style as any;
+    bodyStyle.userSelect = 'none';
+    bodyStyle.webkitUserSelect = 'none';
+    // Only set vendor-specific properties if they exist
+    if ('msUserSelect' in bodyStyle) {
+      bodyStyle.msUserSelect = 'none';
+    }
+    if ('mozUserSelect' in bodyStyle) {
+      bodyStyle.mozUserSelect = 'none';
+    }
 
     // Store event listeners for cleanup
     (window as any).examEventListeners = {
@@ -358,11 +363,17 @@ const Exam = () => {
       document.removeEventListener('MSFullscreenChange', listeners.handleFullscreenChange);
     }
 
-    // Restore text selection
-    document.body.style.userSelect = 'auto';
-    document.body.style.webkitUserSelect = 'auto';
-    document.body.style.msUserSelect = 'auto';
-    document.body.style.mozUserSelect = 'auto';
+    // Restore text selection using proper TypeScript approach
+    const bodyStyle = document.body.style as any;
+    bodyStyle.userSelect = 'auto';
+    bodyStyle.webkitUserSelect = 'auto';
+    // Only set vendor-specific properties if they exist
+    if ('msUserSelect' in bodyStyle) {
+      bodyStyle.msUserSelect = 'auto';
+    }
+    if ('mozUserSelect' in bodyStyle) {
+      bodyStyle.mozUserSelect = 'auto';
+    }
 
     // Exit fullscreen
     if (document.fullscreenElement) {
