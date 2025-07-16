@@ -14,7 +14,9 @@ import {
   ChevronRight, 
   AlertTriangle,
   CheckCircle,
-  Send
+  Send,
+  Shield,
+  Eye
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -24,6 +26,8 @@ const Exam = () => {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [timeLeft, setTimeLeft] = useState(3600); // 60 minutes in seconds
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [tabSwitchCount, setTabSwitchCount] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const navigate = useNavigate();
   const timerRef = useRef<NodeJS.Timeout>();
 
@@ -168,6 +172,7 @@ const Exam = () => {
     (currentPage + 1) * questionsPerPage
   );
 
+  // Anti-cheat system initialization
   useEffect(() => {
     const stored = localStorage.getItem('studentInfo');
     if (!stored) {
@@ -182,10 +187,8 @@ const Exam = () => {
       setAnswers(JSON.parse(savedAnswers));
     }
 
-    // Security measures
-    document.addEventListener('contextmenu', (e) => e.preventDefault());
-    document.body.style.userSelect = 'none';
-    document.body.style.webkitUserSelect = 'none';
+    // Initialize anti-cheat measures
+    initializeAntiCheatSystem();
 
     // Timer
     timerRef.current = setInterval(() => {
@@ -216,11 +219,169 @@ const Exam = () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
-      document.removeEventListener('contextmenu', (e) => e.preventDefault());
-      document.body.style.userSelect = 'auto';
-      document.body.style.webkitUserSelect = 'auto';
+      cleanupAntiCheatSystem();
     };
   }, [navigate]);
+
+  // Anti-cheat system functions
+  const initializeAntiCheatSystem = () => {
+    // Request fullscreen
+    enterFullscreen();
+
+    // Disable right-click context menu
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      toast({
+        title: "Action Blocked",
+        description: "Right-click is disabled during the exam",
+        variant: "destructive"
+      });
+    };
+
+    // Block copy, paste, and other keyboard shortcuts
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Block Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+A, Ctrl+S, F12, etc.
+      if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x', 'a', 's', 'p'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        toast({
+          title: "Action Blocked",
+          description: "Copy/paste operations are disabled during the exam",
+          variant: "destructive"
+        });
+      }
+      
+      // Block F12 (Developer Tools)
+      if (e.key === 'F12') {
+        e.preventDefault();
+        toast({
+          title: "Action Blocked",
+          description: "Developer tools are disabled during the exam",
+          variant: "destructive"
+        });
+      }
+
+      // Block Alt+Tab (Windows) and Cmd+Tab (Mac)
+      if ((e.altKey && e.key === 'Tab') || (e.metaKey && e.key === 'Tab')) {
+        e.preventDefault();
+        toast({
+          title: "Action Blocked",
+          description: "Tab switching is discouraged during the exam",
+          variant: "destructive"
+        });
+      }
+    };
+
+    // Monitor tab visibility changes
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        const newCount = tabSwitchCount + 1;
+        setTabSwitchCount(newCount);
+        
+        toast({
+          title: "⚠️ Tab Switch Detected",
+          description: `You've switched tabs (${newCount} times). Please return to the exam window.`,
+          variant: "destructive"
+        });
+
+        // Log suspicious behavior
+        console.log(`Tab switch detected. Count: ${newCount}`);
+        
+        // Store in localStorage for dashboard tracking
+        const existingLogs = JSON.parse(localStorage.getItem('examLogs') || '[]');
+        existingLogs.push({
+          type: 'tab_switch',
+          timestamp: new Date().toISOString(),
+          count: newCount
+        });
+        localStorage.setItem('examLogs', JSON.stringify(existingLogs));
+      }
+    };
+
+    // Monitor fullscreen changes
+    const handleFullscreenChange = () => {
+      const isCurrentlyFullscreen = !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+      );
+      
+      setIsFullscreen(isCurrentlyFullscreen);
+      
+      if (!isCurrentlyFullscreen) {
+        toast({
+          title: "⚠️ Fullscreen Exit Detected",
+          description: "Please return to fullscreen mode for the exam",
+          variant: "destructive"
+        });
+        
+        // Attempt to re-enter fullscreen
+        setTimeout(() => {
+          enterFullscreen();
+        }, 1000);
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    // Disable text selection
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    document.body.style.msUserSelect = 'none';
+    document.body.style.mozUserSelect = 'none';
+
+    // Store event listeners for cleanup
+    (window as any).examEventListeners = {
+      handleContextMenu,
+      handleKeyDown,
+      handleVisibilityChange,
+      handleFullscreenChange
+    };
+  };
+
+  const cleanupAntiCheatSystem = () => {
+    const listeners = (window as any).examEventListeners;
+    if (listeners) {
+      document.removeEventListener('contextmenu', listeners.handleContextMenu);
+      document.removeEventListener('keydown', listeners.handleKeyDown);
+      document.removeEventListener('visibilitychange', listeners.handleVisibilityChange);
+      document.removeEventListener('fullscreenchange', listeners.handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', listeners.handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', listeners.handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', listeners.handleFullscreenChange);
+    }
+
+    // Restore text selection
+    document.body.style.userSelect = 'auto';
+    document.body.style.webkitUserSelect = 'auto';
+    document.body.style.msUserSelect = 'auto';
+    document.body.style.mozUserSelect = 'auto';
+
+    // Exit fullscreen
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
+  };
+
+  const enterFullscreen = () => {
+    const element = document.documentElement;
+    if (element.requestFullscreen) {
+      element.requestFullscreen();
+    } else if ((element as any).webkitRequestFullscreen) {
+      (element as any).webkitRequestFullscreen();
+    } else if ((element as any).mozRequestFullScreen) {
+      (element as any).mozRequestFullScreen();
+    } else if ((element as any).msRequestFullscreen) {
+      (element as any).msRequestFullscreen();
+    }
+  };
 
   useEffect(() => {
     // Auto-save answers
@@ -252,14 +413,17 @@ const Exam = () => {
       }
     });
 
-    // Store results
+    // Store results with anti-cheat logs
+    const examLogs = JSON.parse(localStorage.getItem('examLogs') || '[]');
     const result = {
       student: studentInfo,
       answers,
       score,
       totalQuestions: questions.length,
       timeTaken: Math.floor(timeTaken / 1000),
-      submittedAt: new Date().toISOString()
+      submittedAt: new Date().toISOString(),
+      tabSwitchCount,
+      securityLogs: examLogs
     };
 
     const existingResults = JSON.parse(localStorage.getItem('examResults') || '[]');
@@ -268,6 +432,7 @@ const Exam = () => {
 
     // Clear exam data
     localStorage.removeItem('examAnswers');
+    localStorage.removeItem('examLogs');
     localStorage.removeItem('studentInfo');
 
     navigate('/submit');
@@ -354,10 +519,33 @@ const Exam = () => {
   if (!studentInfo) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 relative">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 relative exam-mode">
       {/* Student Watermark */}
       <div className="fixed top-4 right-4 bg-black/5 text-gray-600 text-xs px-3 py-1 rounded-full pointer-events-none z-50">
         {studentInfo.name} | {studentInfo.class}
+      </div>
+
+      {/* Floating Security Watermark */}
+      <div className="fixed bottom-4 left-4 opacity-20 text-xs pointer-events-none z-50 text-gray-500">
+        Student: {studentInfo.name} | Class: {studentInfo.class} | MONITORED SESSION
+      </div>
+
+      {/* Security Status Indicators */}
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-lg px-3 py-1 z-50">
+        <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-1">
+            <Shield className={`h-3 w-3 ${isFullscreen ? 'text-green-600' : 'text-red-600'}`} />
+            <span className={isFullscreen ? 'text-green-600' : 'text-red-600'}>
+              {isFullscreen ? 'Secured' : 'Not Secured'}
+            </span>
+          </div>
+          {tabSwitchCount > 0 && (
+            <div className="flex items-center gap-1">
+              <Eye className="h-3 w-3 text-orange-600" />
+              <span className="text-orange-600">Tab switches: {tabSwitchCount}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Timer */}
@@ -371,6 +559,14 @@ const Exam = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8 pt-20">
+        {/* Security Warning */}
+        <Alert className="mb-6 border-yellow-200 bg-yellow-50">
+          <AlertTriangle className="h-4 w-4 text-yellow-600" />
+          <AlertDescription className="text-yellow-800">
+            <strong>⚠️ Security Notice:</strong> This exam is monitored. Copying, pasting, screenshots, and tab switching are tracked. Stay focused on the exam window!
+          </AlertDescription>
+        </Alert>
+
         {/* Header */}
         <Card className="mb-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <CardContent className="p-4">
@@ -399,6 +595,16 @@ const Exam = () => {
             <AlertTriangle className="h-4 w-4 text-red-600" />
             <AlertDescription className="text-red-800">
               <strong>Time Warning:</strong> Less than 5 minutes remaining!
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Tab Switch Warning */}
+        {tabSwitchCount > 0 && (
+          <Alert className="mb-6 border-orange-200 bg-orange-50">
+            <Eye className="h-4 w-4 text-orange-600" />
+            <AlertDescription className="text-orange-800">
+              <strong>Behavior Alert:</strong> {tabSwitchCount} tab switch(es) detected. Please focus on the exam.
             </AlertDescription>
           </Alert>
         )}
@@ -464,6 +670,11 @@ const Exam = () => {
                 <p className="mb-4">
                   You have answered {answeredCount} out of {questions.length} questions.
                 </p>
+                {tabSwitchCount > 0 && (
+                  <p className="mb-4 text-orange-600 text-sm">
+                    Security Note: {tabSwitchCount} tab switch(es) detected during exam.
+                  </p>
+                )}
                 <p className="mb-6 text-sm text-gray-600">
                   Are you sure you want to submit your exam? This action cannot be undone.
                 </p>
