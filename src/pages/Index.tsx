@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { GraduationCap, Clock, Users, BookOpen } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 
 const Index = () => {
   const [studentInfo, setStudentInfo] = useState({
@@ -66,29 +66,6 @@ const Index = () => {
             </div>
           </div>
         </div>
-
-        {/* Current Exam Info */}
-        <Card className="mb-8 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
-            <CardTitle className="text-center text-xl">Current Exam Session</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div className="flex items-center justify-center gap-2">
-                <Clock className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold">Duration: 60 minutes</span>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <BookOpen className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold">Questions: 20</span>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <Users className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold">Active Now</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Student Information Form */}
         <Card className="max-w-md mx-auto bg-white/80 backdrop-blur-sm border-0 shadow-lg">
