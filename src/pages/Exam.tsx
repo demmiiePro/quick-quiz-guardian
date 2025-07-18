@@ -34,7 +34,7 @@ const Exam = () => {
   // Biology questions for SS2 students
   const questions = biologyQuestions;
 
-  const questionsPerPage = 10;
+  const questionsPerPage = 15;
   const totalPages = Math.ceil(questions.length / questionsPerPage);
   const currentQuestions = questions.slice(
     currentPage * questionsPerPage,
