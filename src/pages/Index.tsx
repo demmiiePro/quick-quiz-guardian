@@ -42,12 +42,25 @@ const Index = () => {
   };
 
   const subjects = [
-    'Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology',
-    'Geography', 'History', 'Economics', 'Literature', 'Computer Science'
+    { name: 'Biology', active: true },
+    { name: 'Mathematics', active: false },
+    { name: 'English Language', active: false },
+    { name: 'Physics', active: false },
+    { name: 'Chemistry', active: false },
+    { name: 'Geography', active: false },
+    { name: 'History', active: false },
+    { name: 'Economics', active: false },
+    { name: 'Literature', active: false },
+    { name: 'Computer Science', active: false }
   ];
 
   const classes = [
-    'JSS 1', 'JSS 2', 'JSS 3', 'SS 1', 'SS 2', 'SS 3'
+    { name: 'JSS 1', active: false },
+    { name: 'JSS 2', active: false },
+    { name: 'JSS 3', active: false },
+    { name: 'SS 1', active: false },
+    { name: 'SS 2', active: true },
+    { name: 'SS 3', active: false }
   ];
 
   return (
@@ -61,7 +74,7 @@ const Index = () => {
           >
             <GraduationCap className="h-12 w-12 text-blue-600" />
             <div>
-              <h1 className="text-4xl font-bold text-gray-900">Premier Academy</h1>
+              <h1 className="text-4xl font-bold text-gray-900">Pear Field Secondary School</h1>
               <p className="text-lg text-gray-600">Computer-Based Test System</p>
             </div>
           </div>
@@ -103,8 +116,13 @@ const Index = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {classes.map((cls) => (
-                      <SelectItem key={cls} value={cls}>
-                        {cls}
+                      <SelectItem 
+                        key={cls.name} 
+                        value={cls.name}
+                        disabled={!cls.active}
+                        className={!cls.active ? 'opacity-50 cursor-not-allowed' : ''}
+                      >
+                        {cls.name} {!cls.active && '(Not Available)'}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -125,8 +143,13 @@ const Index = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {subjects.map((subject) => (
-                      <SelectItem key={subject} value={subject}>
-                        {subject}
+                      <SelectItem 
+                        key={subject.name} 
+                        value={subject.name}
+                        disabled={!subject.active}
+                        className={!subject.active ? 'opacity-50 cursor-not-allowed' : ''}
+                      >
+                        {subject.name} {!subject.active && '(Not Available)'}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -146,7 +169,7 @@ const Index = () => {
         {/* Footer */}
         <div className="text-center mt-8 text-gray-600">
           <p className="text-sm">
-            © 2024 Premier Academy. All rights reserved.
+            © 2024 Pear Field Secondary School. All rights reserved.
           </p>
           <p className="text-xs mt-1">
             Secure CBT System - Powered by Lovable

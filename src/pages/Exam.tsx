@@ -18,6 +18,7 @@ import {
   Eye
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { biologyQuestions } from '@/data/biologyQuestions';
 
 const Exam = () => {
   const [studentInfo, setStudentInfo] = useState<any>(null);
@@ -30,139 +31,8 @@ const Exam = () => {
   const navigate = useNavigate();
   const timerRef = useRef<NodeJS.Timeout>();
 
-  // Sample questions - in production, this would come from an API
-  const questions = [
-    {
-      id: 1,
-      type: "multiple_choice",
-      question: "What is the capital city of Nigeria?",
-      options: ["Lagos", "Abuja", "Kano", "Port Harcourt"],
-      correct_answer: "B"
-    },
-    {
-      id: 2,
-      type: "true_false",
-      question: "The Earth is approximately 4.5 billion years old.",
-      correct_answer: "True"
-    },
-    {
-      id: 3,
-      type: "multiple_choice",
-      question: "Which planet is closest to the Sun?",
-      options: ["Venus", "Mercury", "Mars", "Earth"],
-      correct_answer: "B"
-    },
-    {
-      id: 4,
-      type: "short_answer",
-      question: "Define photosynthesis in one sentence.",
-      correct_answer: "The process by which plants make food using sunlight"
-    },
-    {
-      id: 5,
-      type: "multiple_choice",
-      question: "What is 15 × 8?",
-      options: ["110", "120", "130", "140"],
-      correct_answer: "B"
-    },
-    {
-      id: 6,
-      type: "true_false",
-      question: "Water boils at 100°C at sea level.",
-      correct_answer: "True"
-    },
-    {
-      id: 7,
-      type: "multiple_choice",
-      question: "Who wrote the novel 'Things Fall Apart'?",
-      options: ["Wole Soyinka", "Chinua Achebe", "Ben Okri", "Chimamanda Adichie"],
-      correct_answer: "B"
-    },
-    {
-      id: 8,
-      type: "short_answer",
-      question: "What is the formula for calculating the area of a circle?",
-      correct_answer: "π × r²"
-    },
-    {
-      id: 9,
-      type: "multiple_choice",
-      question: "Which gas makes up about 78% of Earth's atmosphere?",
-      options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Argon"],
-      correct_answer: "C"
-    },
-    {
-      id: 10,
-      type: "true_false",
-      question: "The human heart has four chambers.",
-      correct_answer: "True"
-    },
-    {
-      id: 11,
-      type: "multiple_choice",
-      question: "What is the smallest prime number?",
-      options: ["0", "1", "2", "3"],
-      correct_answer: "C"
-    },
-    {
-      id: 12,
-      type: "short_answer",
-      question: "Name the process of changing from liquid to gas.",
-      correct_answer: "Evaporation"
-    },
-    {
-      id: 13,
-      type: "multiple_choice",
-      question: "Which continent is the largest by area?",
-      options: ["Africa", "Asia", "North America", "Europe"],
-      correct_answer: "B"
-    },
-    {
-      id: 14,
-      type: "true_false",
-      question: "Lightning is hotter than the surface of the Sun.",
-      correct_answer: "True"
-    },
-    {
-      id: 15,
-      type: "multiple_choice",
-      question: "What is the past tense of 'go'?",
-      options: ["Goes", "Gone", "Went", "Going"],
-      correct_answer: "C"
-    },
-    {
-      id: 16,
-      type: "short_answer",
-      question: "What is the main function of red blood cells?",
-      correct_answer: "To carry oxygen throughout the body"
-    },
-    {
-      id: 17,
-      type: "multiple_choice",
-      question: "Which element has the chemical symbol 'O'?",
-      options: ["Osmium", "Oxygen", "Gold", "Silver"],
-      correct_answer: "B"
-    },
-    {
-      id: 18,
-      type: "true_false",
-      question: "The Great Wall of China is visible from space.",
-      correct_answer: "False"
-    },
-    {
-      id: 19,
-      type: "multiple_choice",
-      question: "What is 144 ÷ 12?",
-      options: ["11", "12", "13", "14"],
-      correct_answer: "B"
-    },
-    {
-      id: 20,
-      type: "short_answer",
-      question: "What is the largest organ in the human body?",
-      correct_answer: "Skin"
-    }
-  ];
+  // Biology questions for SS2 students
+  const questions = biologyQuestions;
 
   const questionsPerPage = 5;
   const totalPages = Math.ceil(questions.length / questionsPerPage);

@@ -34,7 +34,7 @@ const ExamInfo = () => {
           <div className="inline-flex items-center gap-3">
             <GraduationCap className="h-12 w-12 text-blue-600" />
             <div>
-              <h1 className="text-4xl font-bold text-gray-900">Premier Academy</h1>
+              <h1 className="text-4xl font-bold text-gray-900">Pear Field Secondary School</h1>
               <p className="text-lg text-gray-600">Computer-Based Test System</p>
             </div>
           </div>
@@ -81,7 +81,7 @@ const ExamInfo = () => {
                 <BookOpen className="h-8 w-8 text-green-600" />
                 <div>
                   <p className="text-sm text-gray-600">Questions</p>
-                  <p className="font-semibold text-lg">20 questions</p>
+                  <p className="font-semibold text-lg">50 questions</p>
                 </div>
               </div>
               <div className="flex flex-col items-center gap-2">
@@ -139,7 +139,7 @@ const ExamInfo = () => {
         {/* Footer */}
         <div className="text-center mt-8 text-gray-600">
           <p className="text-sm">
-            © 2024 Premier Academy. All rights reserved.
+            © 2024 Pear Field Secondary School. All rights reserved.
           </p>
           <p className="text-xs mt-1">
             Secure CBT System - Powered by Lovable
