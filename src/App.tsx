@@ -9,6 +9,7 @@ import ExamInfo from "./pages/ExamInfo";
 import Exam from "./pages/Exam";
 import Submit from "./pages/Submit";
 import Dashboard from "./pages/Dashboard";
+import EnhancedDashboard from "./pages/EnhancedDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +25,8 @@ const App = () => (
           <Route path="/exam-info" element={<ExamInfo />} />
           <Route path="/exam" element={<Exam />} />
           <Route path="/submit" element={<Submit />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<EnhancedDashboard />} />
+          <Route path="/basic-dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
